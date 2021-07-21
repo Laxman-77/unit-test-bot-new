@@ -16,7 +16,6 @@ public class JenkinsParser {
         try{
 
             String JENKINS_URL = "https://qa4-automation-jenkins-reports.sprinklr.com/CI_Test/builds/"+ buildNr +"/htmlreports/Reports/index.html";
-            //String _oauth2_proxy = System.getenv("_oauth2_proxy");
 
             String _oauth2_proxy = "bGF4bWFuLmdvbGl5YUBzcHJpbmtsci5jb20=|1626660983|hVrIxXsfJq-Z8qxo_3Jm-ZsOVgw=";
 
