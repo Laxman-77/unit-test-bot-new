@@ -161,20 +161,121 @@ public class MyApp {
         });
 
 
-        app.command("/hello", (req, ctx) -> {
+        app.command("/get_tests_added_by_author",(req,ctx) -> {
+            SlashCommandPayload payload = req.getPayload();
+            System.out.println(payload.getTeamDomain());
+            System.out.println(req.getPayload().getChannelName());
+            System.out.println(req.getPayload().getTeamDomain());
 
-            if(!ALLOWED_CHANNELS.contains(req.getPayload().getChannelName())) return ctx.ack("You are not allowed to use this command in this channel.");
-            String text = req.getPayload().getText();
+            if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
+            if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
+
+            String text = payload.getText();
             String[] temp = text.split(" ");
+            if(temp.length!=2){
+                return ctx.ack("Invalid Command. \n there should be Author name and TimeFrame after the command.");
+            }
+            String author = temp[0];
+            String timeFrame = temp[1];
 
-            String result = "hello "+ temp[0] + " and " + temp[1];
-            System.out.println(req.toString());
-            return ctx.ack(result);
+            Set<String> ALLOWED_TIMEFRAMES = Set.of("ThisWeek","LastWeek","LastSevenDays","ThisMonth","LifeTime");
+            if(!ALLOWED_TIMEFRAMES.contains(timeFrame)) return ctx.ack("Invalid TimeFrame.\nThese are allowed timeFrames: LastWeek, LastSevenDays,ThisWeek,ThisMonth, LifeTime.\n");
+
+
+            Thread thread = new Thread(()-> {
+                try {
+                    TestRunnerDriver.timeFrameSetup(timeFrame);
+                    HashMap<String, String> authorMap = TestRunnerDriver.getAuthorMap();
+
+                    List<String> testsByAuthor = MapUtils.getAllTestsOfAuthor(authorMap,author);
+
+                    String message  = "Test added by "+ author +" in "+ timeFrame + " : " + testsByAuthor.size();
+                    message = "```" + message + " ```";
+                    System.out.println(message);
+
+                    ctx.respond(message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            thread.start();
+            return ctx.ack("Thanks for your request, we'll process it and get back to you.");
+        });
+
+        app.command("/get_tests_failed_by_author",(req,ctx) -> {
+            SlashCommandPayload payload = req.getPayload();
+            System.out.println(payload.getTeamDomain());
+            System.out.println(req.getPayload().getChannelName());
+            System.out.println(req.getPayload().getTeamDomain());
+
+            if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
+            if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
+
+            String text = payload.getText();
+            String[] temp = text.split(" ");
+            if(temp.length!=3){
+                return ctx.ack("Invalid Command. \n there should be AuthorName ,TimeFrame and BuildNumber after the command.");
+            }
+            String author = temp[0];
+            String timeFrame = temp[1];
+            int buildNr = Integer.parseInt(temp[2]);
+
+            Set<String> ALLOWED_TIMEFRAMES = Set.of("ThisWeek","LastWeek","LastSevenDays","ThisMonth","LifeTime");
+            if(!ALLOWED_TIMEFRAMES.contains(timeFrame)) return ctx.ack("Invalid TimeFrame.\nThese are allowed timeFrames: LastWeek, LastSevenDays,ThisWeek,ThisMonth, LifeTime.\n");
+
+
+            Thread thread = new Thread(()-> {
+                try {
+                    TestRunnerDriver.timeFrameSetup(timeFrame);
+                    HashMap<String, String> authorMap = TestRunnerDriver.getAuthorMap();
+                    HashMap<String,String> fullClassName = TestRunnerDriver.getFullClassName();
+
+                    List<String> testsByAuthor = MapUtils.getAllTestsOfAuthor(authorMap,author);
+
+                    List<String> allFailedTests = JenkinsParser.getFailuresList(buildNr);
+                    List<String> failedTestsByAuthor = MapUtils.getAllFailedTestsByAuthor(testsByAuthor,allFailedTests,author);
+
+                    String embeddedListTable = MapUtils.getListAsTableString(failedTestsByAuthor,fullClassName,buildNr);
+
+                    System.out.println(embeddedListTable);
+
+
+
+                    String message = null;
+                    if(allFailedTests.size()>0) {
+                        message = "Test failed by " + author + " in build " + buildNr + " in " + timeFrame + " : " + failedTestsByAuthor.size();
+                        if (failedTestsByAuthor.size() > 0)
+                            message += "\nHere are the failed tests with their logs :\n" + embeddedListTable;
+                        message = "```" + message + " ```";
+                    }
+                    else message = "Jenkins report with build number " + buildNr + " not found.";
+
+                    ctx.respond(message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            thread.start();
+            return ctx.ack("Thanks for your request, we'll process it and get back to you.");
         });
 
 
 
 
+        app.command("/hello", (req, ctx) -> {
+
+            if(!ALLOWED_CHANNELS.contains(req.getPayload().getChannelName())) return ctx.ack("You are not allowed to use this command in this channel.");
+
+            String result = "hello "+ ctx.getRequestUserId();
+            System.out.println(req.toString());
+            return ctx.ack(result);
+        });
 
 
         SlackAppServer server = new SlackAppServer(app);
