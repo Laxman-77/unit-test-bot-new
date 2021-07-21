@@ -1,21 +1,17 @@
 tests/CalculatorTest1.java
  tests.CalculatorTest1
-services/RequestHandler.java
- services.RequestHandler
+services/MapUtils.java
+ services.MapUtils
 tests/CalculatorTestSuite2.java
  tests.CalculatorTestSuite2
-services/JenkinsParser.java
- services.JenkinsParser
+tests/CalculatorTestSuite1.java
+ tests.CalculatorTestSuite1
 tests/CalculatorTest2.java
  tests.CalculatorTest2
 driver/TestRunnerDriver.java
  driver.TestRunnerDriver
  driver.TestRunnerDriver$1
-tests/CalculatorTestSuite1.java
- tests.CalculatorTestSuite1
-components/SlackResponse.java
- components.SlackResponse
-services/MapUtils.java
- services.MapUtils
+services/JenkinsParser.java
+ services.JenkinsParser
 hello/MyApp.java
  hello.MyApp

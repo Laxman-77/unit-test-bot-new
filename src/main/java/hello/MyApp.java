@@ -42,6 +42,7 @@ public class MyApp {
                     "        Supported Time Frames : ThisWeek , LastWeek , LastSevenDays , ThisMonth , LifeTime ```");
         });
 
+
         app.command("/get_all_failures",(req,ctx) -> {
             SlashCommandPayload payload = req.getPayload();
             System.out.println(payload.getTeamDomain());
@@ -206,6 +207,7 @@ public class MyApp {
             return ctx.ack("Thanks for your request, we'll process it and get back to you.");
         });
 
+
         app.command("/get_tests_failed_by_author",(req,ctx) -> {
             SlashCommandPayload payload = req.getPayload();
             System.out.println(payload.getTeamDomain());
@@ -267,13 +269,12 @@ public class MyApp {
         });
 
 
-
-
         app.command("/hello", (req, ctx) -> {
 
             if(!ALLOWED_CHANNELS.contains(req.getPayload().getChannelName())) return ctx.ack("You are not allowed to use this command in this channel.");
 
-            String result = "hello "+ ctx.getRequestUserId();
+            String result = ":wave: hello "+ req.getPayload().getUserName();
+
             System.out.println(req.toString());
             return ctx.ack(result);
         });
