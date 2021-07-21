@@ -1,0 +1,35 @@
+plugins {
+    id("application")
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation("org.slf4j:slf4j-simple:1.7.31")
+    implementation("com.slack.api:bolt:1.9.0")
+    implementation("com.slack.api:bolt-servlet:1.9.0")
+    implementation("com.slack.api:bolt-jetty:1.9.0")
+    // https://mvnrepository.com/artifact/junit/junit
+    implementation group: 'junit', name: 'junit', version: '4.13.2'
+
+    // https://mvnrepository.com/artifact/joda-time/joda-time
+    implementation group: 'joda-time', name: 'joda-time', version: '2.10.9'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
+    // jsoup repo
+    implementation 'org.jsoup:jsoup:1.13.1'
+
+}
+application {
+    mainClassName = "hello.MyApp"
+}
+run {
+    // gradle run -DslackLogLevel=debug
+    systemProperty "org.slf4j.simpleLogger.log.com.slack.api", System.getProperty("slackLogLevel")
+}
