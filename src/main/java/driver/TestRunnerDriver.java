@@ -29,7 +29,7 @@ import static org.apache.commons.lang3.StringUtils.isNumeric;
         CalculatorTestSuite2.class
 })
 public class TestRunnerDriver {
-    private static final String TEST_DIR = "src/main/";
+    private static final String TEST_DIR = "src/main/";  // todo - update TEST_DIR to your current folder after excluding packages
     private static final String FILE_PREFIX = TEST_DIR + "java/";
 
     private static HashMap<String, String> fullClassName = new HashMap<>();
