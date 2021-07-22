@@ -14,12 +14,12 @@ services/JenkinsParser.java
  services.JenkinsParser
 tests/CalculatorTest4.java
  tests.CalculatorTest4
-tests/CalculatorTestSuite1.java
- tests.CalculatorTestSuite1
+tests/CalculatorTest6.java
+ tests.CalculatorTest6
 hello/MyApp.java
  hello.MyApp
+tests/CalculatorTestSuite1.java
+ tests.CalculatorTestSuite1
 driver/TestRunnerDriver.java
  driver.TestRunnerDriver
  driver.TestRunnerDriver$1
-tests/CalculatorTest6.java
- tests.CalculatorTest6

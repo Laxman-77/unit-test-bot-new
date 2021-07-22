@@ -24,4 +24,23 @@ public class CalculatorTest6 {
 
     }
 
+    @Test
+    public void addTest11(){
+
+    }
+
+    @Test
+    public void addTest22(){
+
+    }
+
+    @Test
+    public void subtractTest11(){
+
+    }
+
+    @Test
+    public void subtractTest22(){
+
+    }
 }
