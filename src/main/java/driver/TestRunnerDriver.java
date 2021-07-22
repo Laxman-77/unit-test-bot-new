@@ -1,5 +1,6 @@
 package driver;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -14,6 +15,8 @@ import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 /**
  * @author laxman.goliya
@@ -134,7 +137,10 @@ public class TestRunnerDriver {
                                 if(gitBlameForLine.split(" ").length<=1) continue;
 
                                 String authorName = gitBlameForLine.split(" ")[0];
-                                long lastCommitTime = Integer.parseInt(gitBlameForLine.split(" ")[1]);
+                                String commitTime = gitBlameForLine.split(" ")[1];
+
+                                long lastCommitTime = endTime;
+                                if(isNumeric(commitTime)) lastCommitTime = Integer.parseInt(commitTime);
 
                                 if(lastCommitTime < startTime || lastCommitTime > endTime) continue; // There is no change in this file during the Given TimeFrame
 
@@ -212,13 +218,24 @@ public class TestRunnerDriver {
         String ret = "";
         try {
             pr = Runtime.getRuntime().exec(blameCmd);
+            /**
+             * author-mail <laxman.goliya>
+             * committer-time 1626922714
+             */
+
             BufferedReader buf  = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 
             if( (line = buf.readLine()) != null){  // reading the result of git blame command
                 String commit = buf.readLine();
                 if(commit == null) return "NIL";
                 String authorMail = getAuthorMailFromGitBlame(line);
-                long committerTime = Integer.parseInt(commit.split(" ")[1]);
+                long committerTime = endTime;
+                try{
+                    committerTime = Integer.parseInt(commit.split(" ")[1]);
+                }
+                catch (Exception e){
+                    committerTime = endTime;
+                }
                 ret = authorMail+" "+committerTime;
             }
             buf.close();
@@ -243,6 +260,7 @@ public class TestRunnerDriver {
             builder1.delete(builder1.indexOf("@"),builder1.length()); // remove after @
             builder1.delete(0,builder1.indexOf("<")+1); // remove before <
         }
+        else builder1 = new StringBuilder("not.committed.yet");
 
         return builder1.toString(); // laxman.goliya
     }

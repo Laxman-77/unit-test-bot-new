@@ -4,14 +4,22 @@ services/MapUtils.java
  services.MapUtils
 tests/CalculatorTestSuite2.java
  tests.CalculatorTestSuite2
-tests/CalculatorTestSuite1.java
- tests.CalculatorTestSuite1
+tests/CalculatorTest3.java
+ tests.CalculatorTest3
 tests/CalculatorTest2.java
  tests.CalculatorTest2
+tests/CalculatorTest5.java
+ tests.CalculatorTest5
+services/JenkinsParser.java
+ services.JenkinsParser
+tests/CalculatorTest4.java
+ tests.CalculatorTest4
+tests/CalculatorTestSuite1.java
+ tests.CalculatorTestSuite1
+hello/MyApp.java
+ hello.MyApp
 driver/TestRunnerDriver.java
  driver.TestRunnerDriver
  driver.TestRunnerDriver$1
-services/JenkinsParser.java
- services.JenkinsParser
-hello/MyApp.java
- hello.MyApp
+tests/CalculatorTest6.java
+ tests.CalculatorTest6
