@@ -254,6 +254,7 @@ public class MyApp {
                             message += "\nHere are the failed tests with their logs :\n" + embeddedListTable;
                         message = "```" + message + " ```";
 
+                        System.out.println(message);
                         final String response = message;
                         ctx.respond(response);
                     }

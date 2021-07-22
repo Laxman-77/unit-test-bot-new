@@ -15,7 +15,7 @@ public class MapUtils {
     private static final String NEWLINE_SEPARATOR = "\n";
     private static final String INTERSECTION_CHAR = "+";
 
-    public static List<String> getMapAsList(HashMap<String,String> authorMap, String[] headings){
+    public static List<String> getMapAsList(HashMap<String,String> authorMap, String[] headings ){
         int maxAuthorNameLength = headings[0].length(); // " Test Name " = 11
         int maxTestNameLength = headings[1].length(); // " Author Name " = 13
 
@@ -34,6 +34,7 @@ public class MapUtils {
             | class1.testMethod2       | abhinav.bollam    |
             +--------------------------+-------------------+
          */
+
 
         maxAuthorNameLength += 2; // for extra padding
         maxTestNameLength += 2;
