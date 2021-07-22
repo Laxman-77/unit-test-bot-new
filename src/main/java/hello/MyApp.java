@@ -84,14 +84,15 @@ public class MyApp {
                     String JENKINS_PREFIX = "https://qa4-automation-jenkins-reports.sprinklr.com/CI_Test/builds/";
                     String JENKINS_SUFFIX = "/htmlreports/Reports/index.html";
                     String JENKINS_URL = JENKINS_PREFIX + buildNr + JENKINS_SUFFIX ;
-                    String message = "Here are all the failured tests in build "+ buildNr+":\n" +failureTestAuthorMapTable+ "\n";
+                    String message = "Here are all the failed tests in build "+ buildNr+":\n" +mapTable+ "\n"; // todo - change it back to failureTestAuthorMapTable
                     message = "```" + message + "<" + JENKINS_URL + "|Show More> ```";
 
                     System.out.println(failureTestAuthorMapTable);
 
-                    if(allFailedTests.size()>0)
-                    ctx.respond(message);
-                    else ctx.respond("Jenkins report not found.");
+                    final String response = message;
+                   // if(allFailedTests.size()>0)
+                    ctx.respond( res -> res.responseType("in_channel").text(response));
+                   // else ctx.respond("Jenkins report not found.");
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -150,7 +151,8 @@ public class MyApp {
                     message = "```" + message + "```";
                     System.out.println(message);
 
-                    ctx.respond(message);
+                    final String response = message;
+                    ctx.respond( res -> res.responseType("in_channel").text(response));
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
@@ -257,6 +259,7 @@ public class MyApp {
                     else message = "Jenkins report with build number " + buildNr + " not found.";
 
                     ctx.respond(message);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
