@@ -29,6 +29,8 @@ public class MyApp {
         app.command("/help", (req,ctx) -> {
             SlashCommandPayload payload = req.getPayload();
 
+            System.out.println(payload.getCommand() + " " + payload.getText() + " Triggered by " + payload.getUserName());
+
             if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
             if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
 
@@ -45,9 +47,8 @@ public class MyApp {
 
         app.command("/get_all_failures",(req,ctx) -> {
             SlashCommandPayload payload = req.getPayload();
-            System.out.println(payload.getTeamDomain());
-            System.out.println(req.getPayload().getChannelName());
-            System.out.println(req.getPayload().getTeamDomain());
+
+            System.out.println(payload.getCommand() + " " + payload.getText() + " Triggered by " + payload.getUserName());
 
             if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
             if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
@@ -62,38 +63,42 @@ public class MyApp {
 
             Thread thread = new Thread(()-> {
                 try {
-                    TestRunnerDriver.timeFrameSetup("LifeTime");
-                    HashMap<String, String> authorMap = TestRunnerDriver.getAuthorMap();
-                    String[] headings = {"Test Name","Author Name"};
-                    //String mapTable = MapUtils.getMapAsTableString(authorMap,headings);
                     List<String> allFailedTests = JenkinsParser.getFailuresList(buildNr);
-                    //HashMap<String, String> fullClassName = TestRunnerDriver.getFullClassName();
 
-                    LinkedHashMap<String, String> failuresByAuthor = new LinkedHashMap<>();
+                    if(allFailedTests.size()>0) {
+                        TestRunnerDriver.timeFrameSetup("LifeTime");
+                        HashMap<String, String> authorMap = TestRunnerDriver.getAuthorMap();
+                        String[] headings = {"Test Name", "Author Name"};
+                        //String mapTable = MapUtils.getMapAsTableString(authorMap,headings);
+                        //HashMap<String, String> fullClassName = TestRunnerDriver.getFullClassName();
 
-                    int cnt=0;
-                    for (String test : allFailedTests) {
-                        failuresByAuthor.put(test, authorMap.get(test));
-                        cnt++;
-                        if(cnt>20) break;
+                        LinkedHashMap<String, String> failuresByAuthor = new LinkedHashMap<>();
+
+                        int cnt = 0;
+                        for (String test : allFailedTests) {
+                            failuresByAuthor.put(test, authorMap.get(test));
+                            cnt++;
+                            if (cnt > 20) break;  // slack message in code format can take only few characters. So we are currrently adding only first 20 failures.
+                            // we can give all tests in the form of spreadsheet.
+                        }
+
+
+                        String failureTestAuthorMapTable = MapUtils.getMapAsTableString(failuresByAuthor, headings);
+
+                        String JENKINS_PREFIX = "https://qa4-automation-jenkins-reports.sprinklr.com/CI_Test/builds/";
+                        String JENKINS_SUFFIX = "/htmlreports/Reports/index.html";
+                        String JENKINS_URL = JENKINS_PREFIX + buildNr + JENKINS_SUFFIX;
+                        String message = "Here are all the failed tests in build " + buildNr + ":\n" + failureTestAuthorMapTable + "\n"; //
+                        message = "```" + message + "<" + JENKINS_URL + "|Show More> ```";
+
+                        System.out.println(failureTestAuthorMapTable);
+                        final String response = message;
+                        ctx.respond(response);
                     }
-
-
-                    String failureTestAuthorMapTable = MapUtils.getMapAsTableString(failuresByAuthor,headings);
-
-                    String JENKINS_PREFIX = "https://qa4-automation-jenkins-reports.sprinklr.com/CI_Test/builds/";
-                    String JENKINS_SUFFIX = "/htmlreports/Reports/index.html";
-                    String JENKINS_URL = JENKINS_PREFIX + buildNr + JENKINS_SUFFIX ;
-                    String message = "Here are all the failed tests in build "+ buildNr+":\n" +failureTestAuthorMapTable+ "\n"; //
-                    message = "```" + message + "<" + JENKINS_URL + "|Show More> ```";
-
-                    System.out.println(failureTestAuthorMapTable);
-
-                    final String response = message;
-                    if(allFailedTests.size()>0)
-                    ctx.respond( res -> res.responseType("in_channel").text(response));
-                    else ctx.respond("Jenkins report not found.");
-
+                    else{
+                        final String response = "Jenkins Report with build number "+buildNr + " is not found.\n If you are sure that it is present now, Then maybe the oauth2_proxy token in JenkinsParser has been expired.";
+                        ctx.respond(response);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
@@ -108,9 +113,8 @@ public class MyApp {
 
         app.command("/get_test_count",(req,ctx) -> {
             SlashCommandPayload payload = req.getPayload();
-            System.out.println(payload.getTeamDomain());
-            System.out.println(req.getPayload().getChannelName());
-            System.out.println(req.getPayload().getTeamDomain());
+
+            System.out.println(payload.getCommand() + " " + payload.getText() + " :: Triggered by " + payload.getUserName());
 
             if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
             if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
@@ -122,7 +126,6 @@ public class MyApp {
 
             Set<String> ALLOWED_TIMEFRAMES = Set.of("ThisWeek","LastWeek","LastSevenDays","ThisMonth","LifeTime");
             if(!ALLOWED_TIMEFRAMES.contains(timeFrame)) return ctx.ack("Invalid TimeFrame.\nThese are allowed timeFrames: LastWeek, LastSevenDays,ThisWeek,ThisMonth, LifeTime.\n");
-
 
             Thread thread = new Thread(()-> {
                 try {
@@ -167,9 +170,8 @@ public class MyApp {
 
         app.command("/get_tests_added_by_author",(req,ctx) -> {
             SlashCommandPayload payload = req.getPayload();
-            System.out.println(payload.getTeamDomain());
-            System.out.println(req.getPayload().getChannelName());
-            System.out.println(req.getPayload().getTeamDomain());
+
+            System.out.println(payload.getCommand() + " " + payload.getText() + " :: Triggered by " + payload.getUserName());
 
             if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
             if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
@@ -212,9 +214,8 @@ public class MyApp {
 
         app.command("/get_tests_failed_by_author",(req,ctx) -> {
             SlashCommandPayload payload = req.getPayload();
-            System.out.println(payload.getTeamDomain());
-            System.out.println(req.getPayload().getChannelName());
-            System.out.println(req.getPayload().getTeamDomain());
+
+            System.out.println(payload.getCommand() + " " + payload.getText() + " :: Triggered by " + payload.getUserName());
 
             if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
             if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
@@ -234,31 +235,32 @@ public class MyApp {
 
             Thread thread = new Thread(()-> {
                 try {
-                    TestRunnerDriver.timeFrameSetup(timeFrame);
-                    HashMap<String, String> authorMap = TestRunnerDriver.getAuthorMap();
-                    HashMap<String,String> fullClassName = TestRunnerDriver.getFullClassName();
-
-                    List<String> testsByAuthor = MapUtils.getAllTestsOfAuthor(authorMap,author);
-
                     List<String> allFailedTests = JenkinsParser.getFailuresList(buildNr);
-                    List<String> failedTestsByAuthor = MapUtils.getAllFailedTestsByAuthor(testsByAuthor,allFailedTests,author);
 
-                    String embeddedListTable = MapUtils.getListAsTableString(failedTestsByAuthor,fullClassName,buildNr);
-
-                    System.out.println(embeddedListTable);
-
-
-
-                    String message = null;
                     if(allFailedTests.size()>0) {
-                        message = "Test failed by " + author + " in build " + buildNr + " in " + timeFrame + " : " + failedTestsByAuthor.size();
+                        TestRunnerDriver.timeFrameSetup(timeFrame);
+                        HashMap<String, String> authorMap = TestRunnerDriver.getAuthorMap();
+                        HashMap<String, String> fullClassName = TestRunnerDriver.getFullClassName();
+
+                        List<String> testsByAuthor = MapUtils.getAllTestsOfAuthor(authorMap, author);
+
+                        List<String> failedTestsByAuthor = MapUtils.getAllFailedTestsByAuthor(testsByAuthor, allFailedTests, author);
+
+                        String embeddedListTable = MapUtils.getListAsTableString(failedTestsByAuthor, fullClassName, buildNr);
+
+                        System.out.println(embeddedListTable);
+                        String message = "Test failed by " + author + " in build " + buildNr + ", written in " + timeFrame + " : " + failedTestsByAuthor.size();
                         if (failedTestsByAuthor.size() > 0)
                             message += "\nHere are the failed tests with their logs :\n" + embeddedListTable;
                         message = "```" + message + " ```";
-                    }
-                    else message = "Jenkins report with build number " + buildNr + " not found.";
 
-                    ctx.respond(message);
+                        final String response = message;
+                        ctx.respond(response);
+                    }
+                    else {
+                        final String response = "Jenkins Report with build number "+buildNr + " is not found.\n If you are sure that it is present now, Then maybe the oauth2_proxy token in JenkinsParser has been expired.";
+                        ctx.respond(response);
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -272,9 +274,13 @@ public class MyApp {
         });
 
 
-        app.command("/hello", (req, ctx) -> {
+        app.command("/hello", (req, ctx) -> {  // testing command
+            SlashCommandPayload payload = req.getPayload();
 
-            if(!ALLOWED_CHANNELS.contains(req.getPayload().getChannelName())) return ctx.ack("You are not allowed to use this command in this channel.");
+            System.out.println(payload.getCommand() + " " + payload.getText() + " :: Triggered by " + payload.getUserName());
+
+            if(!ALLOWED_DOMAINS.contains(payload.getTeamDomain())) return ctx.ack("Your TeamDomain is not authorized to use this bot.");
+            if(!ALLOWED_CHANNELS.contains(payload.getChannelName())) return ctx.ack("This channel is not authorized to use this bot.");
 
             String result = ":wave: hello "+ req.getPayload().getUserName();
 

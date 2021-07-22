@@ -105,6 +105,7 @@ public class TestRunnerDriver {
         }
 
         for(String testSuite: testSuites) {
+            System.out.println("Processing started for "+ testSuite);
             Suite.SuiteClasses suiteClasses = Class.forName(testSuite).getAnnotation(Suite.SuiteClasses.class);
 
             Class<?>[] classesInSuite = suiteClasses.value(); // Extracting all test classes in the @SuiteClasses annotations of respective testSuite classes
@@ -113,6 +114,7 @@ public class TestRunnerDriver {
 
                 fullClassName.put(className.getSimpleName(),className.getName());
                 String fileName = FILE_PREFIX + className.getName().replace(".", "/") + ".java";
+                System.out.println("Parsing File : " + fileName);
                 // fileName = src/main/java/com/example/demo/xyz.java
 
                 try {
@@ -269,11 +271,20 @@ public class TestRunnerDriver {
         // line is a method definition line ex. public String fun1(){
         // remove line after (
         StringBuilder builder = new StringBuilder(line);
-        builder.delete(builder.indexOf("("),line.length());
-        line = builder.toString();
+        String methodName = "No_Method_Found";
+        if(builder.indexOf("(")!=-1) {
+            builder.delete(builder.indexOf("("), line.length());
+            line = builder.toString();
 
-        String[] tmp = line.split(" "); // tmp = {"public","String","fun1"}
-        return tmp[tmp.length-1]; // fun1
+            String[] words = line.split(" "); // tmp = {"public","String","fun1"}
+            methodName = words[words.length - 1]; // fun1
+        }
+        else{
+            String[] words = line.split(" ");
+            if(words.length>0) methodName = words[words.length-1];
+        }
+
+        return methodName;
     }
 
 }

@@ -81,6 +81,15 @@ public class MapUtils {
         return heading;
     }
 
+    private static StringBuilder getKeyToEmbeddedKey(String key,HashMap<String,String> fullClassName, int buildNr){
+        String[] tmp = key.split("[.]");
+        StringBuilder builder = new StringBuilder();
+        String JENKINS_URL = "<https://qa4-automation-jenkins-reports.sprinklr.com/CI_Test/builds/"+buildNr+"/htmlreports/Reports/classes/";
+
+        builder.append(JENKINS_URL + fullClassName.get(tmp[0])+".html|").append(key).append(">");
+        return builder;
+    }
+
     public static List<String> getAllTestsOfAuthor(HashMap<String,String> authorMap,String author){
         List<String> list = new ArrayList<>();
         for(Map.Entry entry : authorMap.entrySet()){
