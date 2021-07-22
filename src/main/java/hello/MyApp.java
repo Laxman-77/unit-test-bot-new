@@ -65,9 +65,9 @@ public class MyApp {
                     TestRunnerDriver.timeFrameSetup("LifeTime");
                     HashMap<String, String> authorMap = TestRunnerDriver.getAuthorMap();
                     String[] headings = {"Test Name","Author Name"};
-                    String mapTable = MapUtils.getMapAsTableString(authorMap,headings);
+                    //String mapTable = MapUtils.getMapAsTableString(authorMap,headings);
                     List<String> allFailedTests = JenkinsParser.getFailuresList(buildNr);
-                    HashMap<String, String> fullClassName = TestRunnerDriver.getFullClassName();
+                    //HashMap<String, String> fullClassName = TestRunnerDriver.getFullClassName();
 
                     LinkedHashMap<String, String> failuresByAuthor = new LinkedHashMap<>();
 
@@ -75,7 +75,7 @@ public class MyApp {
                     for (String test : allFailedTests) {
                         failuresByAuthor.put(test, authorMap.get(test));
                         cnt++;
-                        if(cnt>10) break;
+                        if(cnt>20) break;
                     }
 
 
@@ -84,15 +84,15 @@ public class MyApp {
                     String JENKINS_PREFIX = "https://qa4-automation-jenkins-reports.sprinklr.com/CI_Test/builds/";
                     String JENKINS_SUFFIX = "/htmlreports/Reports/index.html";
                     String JENKINS_URL = JENKINS_PREFIX + buildNr + JENKINS_SUFFIX ;
-                    String message = "Here are all the failed tests in build "+ buildNr+":\n" +mapTable+ "\n"; // todo - change it back to failureTestAuthorMapTable
+                    String message = "Here are all the failed tests in build "+ buildNr+":\n" +failureTestAuthorMapTable+ "\n"; //
                     message = "```" + message + "<" + JENKINS_URL + "|Show More> ```";
 
                     System.out.println(failureTestAuthorMapTable);
 
                     final String response = message;
-                   // if(allFailedTests.size()>0)
+                    if(allFailedTests.size()>0)
                     ctx.respond( res -> res.responseType("in_channel").text(response));
-                   // else ctx.respond("Jenkins report not found.");
+                    else ctx.respond("Jenkins report not found.");
 
                 } catch (IOException e) {
                     e.printStackTrace();
